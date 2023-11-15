@@ -5,13 +5,15 @@ import { sequelize } from "../database";
 import { adminJsResources } from "./resources";
 import { User } from '../models'
 import bcrypt from 'bcrypt'
+import { locale } from './locale'
 
 AdminJS.registerAdapter(AdminJSSequelize);
 
 export const adminJs = new AdminJS({
   databases: [sequelize],
-  rootPath: "/admin",
-	resources: adminJsResources,
+  resources: adminJsResources,
+  rootPath: '/admin',
+  locale: locale,
   branding: {
     companyName: 'HealthFlix',
     logo: '/healthflix.png',
