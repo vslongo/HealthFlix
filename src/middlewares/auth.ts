@@ -18,14 +18,35 @@ export function ensureAuth(req: AuthenticateRequest, res: Response, next: NextFu
 
   const token = authorizationHeader.replace(/Bearer /, '')
 
-  jwtService.verifyToken(token, (err, decoded) => {
+  jwtService.verifyToken(token, async (err, decoded) => {
     if(err || typeof decoded === 'undefined') return res.status(401).json({ 
       message: 'Token inválido' 
     })
     
-    userService.findByEmail((decoded as JwtPayload).email).then(user => {
+    const user = await userService.findByEmail((decoded as JwtPayload).email)
       req.user = user
       next()
+  })
+}
+
+export function ensureAuthViaQuery(req: AuthenticateRequest, res: Response, next: NextFunction) {
+  const { token } = req.query
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token não informado' })
+  }
+
+  if(typeof token !== 'string') {
+    return res.status(401).json({ message: 'Token inválido' })
+  }
+
+  jwtService.verifyToken(token, async (err, decoded) => {
+    if(err || typeof decoded === 'undefined') return res.status(401).json({ 
+      message: 'Token inválido' 
     })
+    
+    const user = await userService.findByEmail((decoded as JwtPayload).email)
+    req.user = user
+    next()
   })
 }
