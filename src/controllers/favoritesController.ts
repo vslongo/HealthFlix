@@ -2,7 +2,21 @@ import { Response } from "express";
 import { AuthenticateRequest } from "../middlewares/auth";
 import { favoriteService } from "../services/favoriteService";
 
-export const favoriteController = {
+export const favoritesController = {
+  // GET /favorites
+  index: async (req: AuthenticateRequest, res: Response) => {
+    const userId = req.user!.id
+
+    try {
+      const favorites = await favoriteService.findByUserId(userId)
+      return res.json(favorites)
+    } catch (err) {
+      if (err instanceof Error) {
+        return res.status(400).json({ message: err.message })
+      }
+    }
+  },
+
   save: async (req: AuthenticateRequest, res: Response) => {
     const userId = req.user!.id
     const { courseId } = req.body
