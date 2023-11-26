@@ -28,5 +28,18 @@ export const favoritesController = {
       if(err instanceof Error)
       return res.status(500).json({message: err.message})
     }
+  },
+
+  delete: async (req: AuthenticateRequest, res: Response) => {
+    const userId = req.user!.id
+    const courseId  = req.params.id
+
+    try {
+      await favoriteService.delete(userId, Number(courseId))
+      return res.status(204).send()
+    } catch (err) {
+      if(err instanceof Error)
+      return res.status(500).json({message: err.message})
+    }
   }
 }
