@@ -37,6 +37,34 @@ export const usersController = {
     }
   },
 
+  updatePassword: async (req: AuthenticateRequest, res: Response) => {
+    const user = req.user
+    const { currentPassword, newPassword } = req.body
+
+    if (!user) {
+      return res.status(401).json({ message: 'Não autorizado!' })
+    }
+
+    try {
+      user.checkPassword(currentPassword, async (err, isSame) => {
+        if (err) {
+          return res.status(400).json({ message: err.message })
+        }
+
+        if (!isSame) {
+          return res.status(400).json({ message: 'Senha incorreta' })
+        }
+
+        await userService.updatePassword(user.id, newPassword)
+        return res.status(204).send()
+      })
+    } catch (err) {
+      if (err instanceof Error) {
+        return res.status(400).json({ message: err.message })
+      }
+    }
+  },
+
   // GET /users/current/watching
   watching: async (req: AuthenticateRequest, res: Response) => {
     const { id } = req.user!
